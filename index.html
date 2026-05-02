@@ -350,13 +350,22 @@ async function sendMessage() {
     });
 
     const data = await res.json();
+    
+    // Show exact error for debugging
+    if (!res.ok || data.error) {
+      const errMsg = data.error?.message || data.error?.status || JSON.stringify(data.error) || 'Unknown error';
+      removeTyping();
+      addMessage('assistant', '❌ Lỗi API: ' + errMsg);
+      return;
+    }
+
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Xin lỗi, tôi không thể trả lời lúc này.';
     removeTyping();
     addMessage('assistant', reply);
     chatHistory.push({ role: 'model', parts: [{ text: reply }] });
   } catch (err) {
     removeTyping();
-    addMessage('assistant', 'Xin lỗi, có lỗi xảy ra khi kết nối. Vui lòng thử lại.');
+    addMessage('assistant', '❌ Lỗi kết nối: ' + err.message);
   } finally {
     isLoading = false;
     document.getElementById('send-btn').disabled = false;
