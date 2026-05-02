@@ -374,3 +374,203 @@ document.getElementById('msg-input').addEventListener('keydown', function(e) {
 </script>
 </body>
 </html>
+
+    color:"#a8d8ea", bg:"linear-gradient(135deg,#0f0f0f,#1c1c1e)",
+    personality:`Bạn là Steve Jobs. Hãy trả lời như nhà lãnh đạo công nghệ và nhà thiết kế hoàn hảo.
+Tập trung cao độ vào sự đơn giản, vẻ đẹp và trải nghiệm người dùng. Thách thức tư duy thông thường: Think Different. Thẳng thắn, đôi khi gay gắt nhưng luôn truyền cảm hứng. Trả lời bằng tiếng Việt.`
+  },
+  {
+    id:"musk", name:"Elon Musk", title:"CEO Tesla & SpaceX",
+    years:"1971–hiện tại", emoji:"🚀", portrait:"🛸",
+    color:"#e74c3c", bg:"linear-gradient(135deg,#0a0a0a,#1a0a00)",
+    personality:`Bạn là Elon Musk. Hãy trả lời như doanh nhân công nghệ đang thay đổi tương lai nhân loại.
+Tư duy từ nguyên lý cơ bản. Nói về việc đưa con người lên sao Hỏa. Dùng ngôn ngữ kỹ thuật, tư duy kỹ sư. Táo bạo, đôi khi gây tranh cãi, luôn tham vọng. Trả lời bằng tiếng Việt.`
+  },
+  {
+    id:"newton", name:"Isaac Newton", title:"Cha đẻ của cơ học cổ điển",
+    years:"1643–1727", emoji:"🌳", portrait:"🌳",
+    color:"#8bc34a", bg:"linear-gradient(135deg,#0f1a00,#1a2e00)",
+    personality:`Bạn là Isaac Newton. Hãy trả lời như cha đẻ của cơ học cổ điển và giải tích.
+Chính xác, có phương pháp và logic tuyệt đối. Nhắc đến công trình về trọng lực, quang học và toán học. Tin rằng vũ trụ vận hành theo các quy luật toán học. Trả lời bằng tiếng Việt.`
+  },
+  {
+    id:"darwin", name:"Charles Darwin", title:"Cha đẻ thuyết tiến hóa",
+    years:"1809–1882", emoji:"🐢", portrait:"🦎",
+    color:"#66bb6a", bg:"linear-gradient(135deg,#001a00,#002800)",
+    personality:`Bạn là Charles Darwin. Hãy trả lời như nhà tự nhiên học đã khám phá cơ chế tiến hóa.
+Kiên nhẫn, quan sát tỉ mỉ và tò mò về mọi dạng sống. Nhắc đến chuyến hải trình trên tàu Beagle, quần đảo Galapagos. Nói về chọn lọc tự nhiên. Trả lời bằng tiếng Việt.`
+  },
+  {
+    id:"curie", name:"Marie Curie", title:"Nhà khoa học đoạt 2 giải Nobel",
+    years:"1867–1934", emoji:"☢️", portrait:"🔭",
+    color:"#f48fb1", bg:"linear-gradient(135deg,#1a0010,#2d0020)",
+    personality:`Bạn là Marie Curie. Hãy trả lời như nhà vật lý và hóa học tiên phong khám phá phóng xạ.
+Quyết tâm, đam mê khoa học hơn danh tiếng. Nhắc đến việc khám phá polonium và radium. Nói về những thách thức khi là phụ nữ trong khoa học. Trả lời bằng tiếng Việt.`
+  },
+  {
+    id:"shakespeare", name:"William Shakespeare", title:"Nhà viết kịch vĩ đại nhất",
+    years:"1564–1616", emoji:"🎭", portrait:"📜",
+    color:"#ffd700", bg:"linear-gradient(135deg,#1a1500,#2d2200)",
+    personality:`Bạn là William Shakespeare. Hãy trả lời như nhà viết kịch và thi nhân vĩ đại nhất.
+Dùng ngôn ngữ phong phú, giàu hình ảnh và ẩn dụ. Rút ra trí tuệ từ các vở kịch của bạn. Đặt ra những câu hỏi về bản chất con người. Trả lời bằng tiếng Việt với giọng điệu thơ ca.`
+  },
+  {
+    id:"confucius", name:"Khổng Tử", title:"Triết gia & Nhà tư tưởng",
+    years:"551–479 TCN", emoji:"☯️", portrait:"📿",
+    color:"#ffb74d", bg:"linear-gradient(135deg,#1a0d00,#2d1a00)",
+    personality:`Bạn là Khổng Tử. Hãy trả lời như triết gia vĩ đại của Trung Hoa.
+Nói với trí tuệ, bình tĩnh và chiều sâu đạo đức. Dùng phép loại suy và câu chuyện ngụ ngôn. Nhắc đến nhân, lễ, nghĩa, trí, tín. Nhấn mạnh tự tu thân và hòa hợp xã hội. Trả lời bằng tiếng Việt.`
+  }
+];
+
+let currentMind = null;
+let chatHistory = [];
+let isLoading = false;
+
+// Build grid
+const grid = document.getElementById('minds-grid');
+MINDS.forEach(mind => {
+  const card = document.createElement('div');
+  card.className = 'mind-card';
+  card.style.background = mind.bg;
+  card.innerHTML = `
+    <div class="card-glow" style="background:${mind.color}25"></div>
+    <div class="card-top">
+      <span class="card-portrait">${mind.portrait}</span>
+      <span class="card-badge" style="color:${mind.color};border-color:${mind.color}50;background:${mind.color}18">${mind.emoji}</span>
+    </div>
+    <div class="card-name" style="color:${mind.color}">${mind.name}</div>
+    <div class="card-title-text">${mind.title}</div>
+    <div class="card-years">${mind.years}</div>
+    <div class="card-line" style="background:${mind.color}"></div>
+  `;
+  card.addEventListener('mouseenter', () => {
+    card.style.boxShadow = `0 20px 55px rgba(0,0,0,0.65), 0 0 35px ${mind.color}40`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.boxShadow = ''; });
+  card.addEventListener('click', () => openChat(mind));
+  grid.appendChild(card);
+});
+
+function openChat(mind) {
+  currentMind = mind;
+  chatHistory = [];
+  document.getElementById('chat-portrait').textContent = mind.portrait;
+  document.getElementById('chat-name').textContent = mind.name;
+  document.getElementById('chat-name').style.color = mind.color;
+  document.getElementById('chat-title-label').textContent = mind.title;
+  document.getElementById('live-dot').style.background = mind.color;
+  document.getElementById('live-dot').style.color = mind.color;
+  document.getElementById('msg-input').placeholder = `Hỏi ${mind.name} điều gì đó...`;
+  document.getElementById('msg-input').style.borderColor = mind.color + '55';
+  document.getElementById('send-btn').style.background = mind.color;
+  document.getElementById('send-btn').style.color = '#000';
+  document.getElementById('chat-view').style.background = mind.bg;
+  document.getElementById('messages-area').innerHTML = '';
+  addMessage('assistant', `Xin chào! Tôi là ${mind.name}. Hãy hỏi tôi bất cứ điều gì bạn muốn biết. Tôi rất vui được chia sẻ những suy nghĩ và trải nghiệm của mình với bạn.`);
+  document.getElementById('grid-view').style.display = 'none';
+  document.getElementById('chat-view').classList.add('active');
+  document.getElementById('msg-input').focus();
+}
+
+function goBack() {
+  document.getElementById('chat-view').classList.remove('active');
+  document.getElementById('grid-view').style.display = '';
+  currentMind = null; chatHistory = [];
+}
+
+function addMessage(role, text) {
+  const area = document.getElementById('messages-area');
+  const row = document.createElement('div');
+  row.className = `msg-row ${role === 'user' ? 'user' : ''}`;
+  if (role === 'assistant') {
+    const av = document.createElement('div');
+    av.className = 'msg-avatar';
+    av.textContent = currentMind.portrait;
+    av.style.background = currentMind.color + '28';
+    row.appendChild(av);
+  }
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${role === 'user' ? 'user' : 'ai'}`;
+  if (role === 'user') bubble.style.background = currentMind.color;
+  else bubble.style.borderColor = currentMind.color + '40';
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  area.appendChild(row);
+  area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('messages-area');
+  const row = document.createElement('div');
+  row.className = 'msg-row'; row.id = 'typing-row';
+  const av = document.createElement('div');
+  av.className = 'msg-avatar'; av.textContent = currentMind.portrait;
+  av.style.background = currentMind.color + '28';
+  row.appendChild(av);
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ai typing-indicator';
+  bubble.style.borderColor = currentMind.color + '40';
+  [1,2,3].forEach(() => {
+    const dot = document.createElement('span');
+    dot.className = 'dot'; dot.style.background = currentMind.color;
+    bubble.appendChild(dot);
+  });
+  row.appendChild(bubble);
+  area.appendChild(row);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-row');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  input.value = ''; input.style.height = 'auto';
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', parts: [{ text }] });
+  showTyping();
+
+  try {
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: currentMind.personality }] },
+        contents: chatHistory,
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.9 }
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Xin lỗi, tôi không thể trả lời lúc này.';
+    removeTyping();
+    addMessage('assistant', reply);
+    chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+  } catch (err) {
+    removeTyping();
+    addMessage('assistant', 'Xin lỗi, có lỗi xảy ra khi kết nối. Vui lòng thử lại.');
+  } finally {
+    isLoading = false;
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
+  }
+}
+
+document.getElementById('msg-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+});
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+</script>
+</body>
+</html>
