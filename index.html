@@ -115,12 +115,36 @@
 </head>
 <body>
 
-<div id="grid-view">
+<!-- KEY SETUP SCREEN -->
+<div id="key-screen" style="display:none">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#080808">
+    <div style="max-width:440px;width:100%;text-align:center">
+      <div style="font-size:56px;margin-bottom:20px">🔑</div>
+      <h2 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin-bottom:10px;background:linear-gradient(90deg,#c9a84c,#f0e0a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Nhập API Key</h2>
+      <p style="color:rgba(232,224,208,0.55);font-size:15px;margin-bottom:8px;font-style:italic">Miễn phí tại openrouter.ai</p>
+      <p style="color:rgba(232,224,208,0.35);font-size:13px;margin-bottom:28px">Key được lưu trên máy bạn, không gửi đi đâu khác</p>
+      <input id="key-input" type="password" placeholder="sk-or-v1-..." 
+        style="width:100%;padding:14px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(201,168,76,0.4);border-radius:12px;color:#e8e0d0;font-size:15px;font-family:'Crimson Pro',serif;outline:none;margin-bottom:14px"/>
+      <button onclick="saveKey()" 
+        style="width:100%;padding:14px;background:linear-gradient(90deg,#c9a84c,#f0e0a0);border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#000;cursor:pointer;transition:opacity 0.2s"
+        onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+        Bắt đầu →
+      </button>
+      <p style="margin-top:20px;color:rgba(232,224,208,0.35);font-size:12px">
+        Chưa có key? Đăng ký miễn phí tại 
+        <a href="https://openrouter.ai" target="_blank" style="color:#c9a84c;text-decoration:none">openrouter.ai</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="grid-view" style="display:none">
   <div class="page-header">
     <div class="header-decor">✦ &nbsp; ✦ &nbsp; ✦</div>
     <h1 class="page-title">BRILLIANT MINDS</h1>
     <p class="page-sub">Nói chuyện với 10 bộ não vĩ đại nhất lịch sử nhân loại</p>
     <div class="header-decor">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <button onclick="changeKey()" style="margin-top:16px;padding:8px 18px;background:rgba(255,255,255,0.06);border:1px solid rgba(201,168,76,0.3);border-radius:8px;color:rgba(201,168,76,0.7);font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">🔑 Đổi API Key</button>
   </div>
   <div class="minds-grid" id="minds-grid"></div>
 </div>
@@ -147,8 +171,8 @@
 </div>
 
 <script>
-const OR_KEY = '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';
 const OR_URL = 'https://openrouter.ai/api/v1/chat/completions';
+let OR_KEY = localStorage.getItem('or_api_key') || '';
 
 const MINDS = [
   {
@@ -278,6 +302,40 @@ function goBack() {
   document.getElementById('grid-view').style.display = '';
   currentMind = null; chatHistory = [];
 }
+
+function saveKey() {
+  const key = document.getElementById('key-input').value.trim();
+  if (!key.startsWith('sk-or-')) {
+    alert('Key không hợp lệ! Key phải bắt đầu bằng sk-or-');
+    return;
+  }
+  OR_KEY = key;
+  localStorage.setItem('or_api_key', key);
+  document.getElementById('key-screen').style.display = 'none';
+  document.getElementById('grid-view').style.display = '';
+}
+
+function changeKey() {
+  OR_KEY = '';
+  localStorage.removeItem('or_api_key');
+  document.getElementById('chat-view').classList.remove('active');
+  document.getElementById('grid-view').style.display = 'none';
+  document.getElementById('key-screen').style.display = '';
+  document.getElementById('key-input').value = '';
+  currentMind = null; chatHistory = [];
+}
+
+// Init: show key screen or grid
+window.addEventListener('DOMContentLoaded', () => {
+  if (OR_KEY) {
+    document.getElementById('grid-view').style.display = '';
+  } else {
+    document.getElementById('key-screen').style.display = '';
+  }
+  document.getElementById('key-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveKey();
+  });
+});
 
 function addMessage(role, text) {
   const area = document.getElementById('messages-area');
