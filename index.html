@@ -147,8 +147,8 @@
 </div>
 
 <script>
-const GEMINI_KEY = 'AIzaSyC_j6wUTF8J8kUBKhmrUj6RRe-PW2Ifuk8';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const OR_KEY = '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';
+const OR_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const MINDS = [
   {
@@ -335,34 +335,43 @@ async function sendMessage() {
   document.getElementById('send-btn').disabled = true;
 
   addMessage('user', text);
-  chatHistory.push({ role: 'user', parts: [{ text }] });
+  chatHistory.push({ role: 'user', content: text });
   showTyping();
 
   try {
-    const res = await fetch(GEMINI_URL, {
+    const messages = [
+      { role: 'system', content: currentMind.personality },
+      ...chatHistory
+    ];
+    const res = await fetch(OR_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OR_KEY,
+        'HTTP-Referer': 'https://bo-nao-thien-tai.vercel.app',
+        'X-Title': 'Brilliant Minds'
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: currentMind.personality }] },
-        contents: chatHistory,
-        generationConfig: { maxOutputTokens: 1000, temperature: 0.9 }
+        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        messages: messages,
+        max_tokens: 1000,
+        temperature: 0.9
       })
     });
 
     const data = await res.json();
-    
-    // Show exact error for debugging
+
     if (!res.ok || data.error) {
-      const errMsg = data.error?.message || data.error?.status || JSON.stringify(data.error) || 'Unknown error';
+      const errMsg = data.error?.message || JSON.stringify(data.error) || 'Unknown error';
       removeTyping();
       addMessage('assistant', '❌ Lỗi API: ' + errMsg);
       return;
     }
 
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Xin lỗi, tôi không thể trả lời lúc này.';
+    const reply = data.choices?.[0]?.message?.content || 'Xin lỗi, tôi không thể trả lời lúc này.';
     removeTyping();
     addMessage('assistant', reply);
-    chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+    chatHistory.push({ role: 'assistant', content: reply });
   } catch (err) {
     removeTyping();
     addMessage('assistant', '❌ Lỗi kết nối: ' + err.message);
